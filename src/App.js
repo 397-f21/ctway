@@ -33,8 +33,24 @@ const StationList = ({ stations }) => (
 // station.location = {latitude: ..., longitude...}
 // userLoc = {latitude: ..., longitude...}
 const sortByDist = (stations, userLoc) => {
-    console.log(getDistance(stations[0].location, userLoc));
-    return stations.sort((s1, s2) => getDistance(s1.location, userLoc) - getDistance(s2.location, userLoc));
+    // console.log(stations)
+    console.log(userLoc);
+    const formattedUserLoc = {
+        latitude: userLoc.latitude,
+        longitude: userLoc.longitude
+    }
+    console.log(getDistance(stations[0].location, formattedUserLoc));
+    return stations.sort((s1, s2) => {
+        const s1LocFormat = {
+            latitude: parseFloat(s1.location.latitude),
+            longitude: parseFloat(s1.location.longitude)
+        };
+        const s2LocFormat = {
+            latitude: parseFloat(s2.location.latitude),
+            longitude: parseFloat(s2.location.longitude)
+        };
+        return getDistance(s1LocFormat, formattedUserLoc) - getDistance(s2LocFormat, formattedUserLoc)
+    });
 }
 
 const kNearestStations = (stations, userLoc, k) =>
@@ -55,28 +71,27 @@ const stops_url = 'https://data.cityofchicago.org/resource/8pix-ypme.json'
 
 function App() {
     const [stations, setStations] = useState([])
-    const [userLoc, setUserLoc] = useState([]);
+    const [userLoc, setUserLoc] = useState();
 
     function getLocation(){
         navigator.geolocation.getCurrentPosition(function(position) {
             setUserLoc(position.coords);
         });
     }
-
+    const getTrainStops = async (url) => {
+        const response = await fetch(url, {"app_token": "Bekodn643P417LZVWPfAeTldB"});
+        if (!response.ok) throw response;
+        const json = await response.json();
+        console.log(json);
+        setStations(json);
+    }
     useEffect(() => {
-        const getTrainStops = async (url) => {
-            const response = await fetch(url, {"app_token": "Bekodn643P417LZVWPfAeTldB"});
-            if (!response.ok) throw response;
-            const json = await response.json();
-            console.log(json);
-            setStations(json);
-        }
         //getTrainTracker(train_url);
         getTrainStops(stops_url);
         getLocation();
     }, [])
 
-    if(!stations) return <h1>Awaiting stations...</h1>;
+    if(stations.length === 0) return <h1>Awaiting stations...</h1>;
     if(!userLoc) return <h1>Awaiting user location...</h1>;
     
     return (
