@@ -6,27 +6,34 @@ require('dotenv').config();
 
 // PUT TRAIN_TRACKER_KEY HERE
 const trainTrackerKey = "344088052b6d4c6a91bccd12775f34b3";
-
 const Header = () => {
     return (
         <h1>CTWay</h1>
     )
 }
 
-const Card = ({ station }) => {
+const Card = ({ station, location }) => {
+    const formattedLoc = {
+        latitude: location.latitude,
+        longitude: location.longitude
+    }
+    const formattedStationLoc = {
+        latitude: parseFloat(station.location.latitude),
+        longitude: parseFloat(station.location.longitude)
+    }
     return (
         <div className="card">
             <div className="card-body">
                 <div className="card-title">{station.stop_name}</div>
-                <div className="card-text"></div>
+                <div className="card-text">{getDistance(formattedLoc, formattedStationLoc)} meters</div>
             </div>
         </div>
     )
 }
 
-const StationList = ({ stations }) => (
+const StationList = ({ stations, location }) => (
     <div>
-        { stations.map(station => <Card key={station.stop_id} station={ station } />) }
+        { stations.map(station => <Card key={station.stop_id} location={location} station={ station } />) }
     </div>
 )
 
@@ -69,11 +76,13 @@ const stops_url = 'https://data.cityofchicago.org/resource/8pix-ypme.json'
 //     console.log(json);
 // }
 
+const stationsMapped = {}
+
 function App() {
     const [stations, setStations] = useState([])
     const [userLoc, setUserLoc] = useState();
 
-    function getLocation(){
+    const getLocation = async () => {
         navigator.geolocation.getCurrentPosition(function(position) {
             setUserLoc(position.coords);
         });
@@ -87,8 +96,8 @@ function App() {
     }
     useEffect(() => {
         //getTrainTracker(train_url);
-        getTrainStops(stops_url);
         getLocation();
+        getTrainStops(stops_url);
     }, [])
 
     if(stations.length === 0) return <h1>Awaiting stations...</h1>;
@@ -97,7 +106,7 @@ function App() {
     return (
         <div>
             <Header />
-            <StationList stations = {kNearestStations(stations, userLoc, 9)}/>
+            <StationList location={userLoc} stations={kNearestStations(stations, userLoc, 9)}/>
         </div>
     );
 }
