@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {getDistance} from 'geolib';
 
 
 require('dotenv').config();
@@ -29,17 +30,19 @@ const StationList = ({ stations }) => (
     </div>
 )
 
-function getLocation(){
-    navigator.geolocation.getCurrentPosition(function(position) {
-        console.log("Latitude is :", position.coords.latitude);
-        console.log("Longitude is :", position.coords.longitude);
-    });
+// station.location = {latitude: ..., longitude...}
+// userLoc = {latitude: ..., longitude...}
+const sortByDist = (stations, userLoc) => {
+    console.log(getDistance(stations[0].location, userLoc));
+    return stations.sort((s1, s2) => getDistance(s1.location, userLoc) - getDistance(s2.location, userLoc));
 }
 
-const train_url = `http://lapi.transitchicago.com/api/1.0/ttfollow.aspx?key=${trainTrackerKey}&runnumber=830&outputType=JSON`;
+const kNearestStations = (stations, userLoc, k) =>
+    sortByDist(stations, userLoc).slice(0, k);
+
+
+//const train_url = `http://lapi.transitchicago.com/api/1.0/ttfollow.aspx?key=${trainTrackerKey}&runnumber=830&outputType=JSON`;
 const stops_url = 'https://data.cityofchicago.org/resource/8pix-ypme.json'
-
-
 
 // const getTrainTracker = async (url) => {
 //     console.log(trainTrackerKey);
@@ -52,6 +55,14 @@ const stops_url = 'https://data.cityofchicago.org/resource/8pix-ypme.json'
 
 function App() {
     const [stations, setStations] = useState([])
+    const [userLoc, setUserLoc] = useState([]);
+
+    function getLocation(){
+        navigator.geolocation.getCurrentPosition(function(position) {
+            setUserLoc(position.coords);
+        });
+    }
+
     useEffect(() => {
         const getTrainStops = async (url) => {
             const response = await fetch(url, {"app_token": "Bekodn643P417LZVWPfAeTldB"});
@@ -64,11 +75,14 @@ function App() {
         getTrainStops(stops_url);
         getLocation();
     }, [])
+
+    if(!stations) return <h1>Awaiting stations...</h1>;
+    if(!userLoc) return <h1>Awaiting user location...</h1>;
     
     return (
         <div>
             <Header />
-            <StationList stations = {stations}/>
+            <StationList stations = {kNearestStations(stations, userLoc, 9)}/>
         </div>
     );
 }
