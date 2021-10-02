@@ -29,6 +29,12 @@ const StationList = ({ stations }) => (
     </div>
 )
 
+function getLocation(){
+    navigator.geolocation.getCurrentPosition(function(position) {
+        console.log("Latitude is :", position.coords.latitude);
+        console.log("Longitude is :", position.coords.longitude);
+    });
+}
 
 const train_url = `http://lapi.transitchicago.com/api/1.0/ttfollow.aspx?key=${trainTrackerKey}&runnumber=830&outputType=JSON`;
 const stops_url = 'https://data.cityofchicago.org/resource/8pix-ypme.json'
@@ -56,6 +62,7 @@ function App() {
         }
         //getTrainTracker(train_url);
         getTrainStops(stops_url);
+        getLocation();
     }, [])
     
     return (
@@ -65,5 +72,6 @@ function App() {
         </div>
     );
 }
+
 
 export default App;
