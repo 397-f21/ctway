@@ -39,7 +39,7 @@ const Card = ({ station, location }) => {
                             </svg>
                         </div>
                         <div>
-                            <h1>{station.stop_name}</h1>
+                            <h1>{station.station_name}</h1>
                         </div>
                     </div>
                     <div className="card-text">{roundedDistance} miles</div>
@@ -51,7 +51,7 @@ const Card = ({ station, location }) => {
 
 const StationList = ({ stations, location }) => (
     <div className="card-wrapper">
-        { stations.map(station => <Card key={station.stop_id} location={location} station={ station } />) }
+        { stations.map(station => <Card key={station.map_id} location={location} station={ station } />) }
     </div>
 )
 
@@ -95,7 +95,28 @@ const stops_url = 'https://data.cityofchicago.org/resource/8pix-ypme.json'
 //     console.log(json);
 // }
 
-const stationsMapped = {}
+const formatStations = (ctaData) => {
+    const stationMap = ctaData.reduce((stations, ctaStop) => {
+        const station = (stations[ctaStop.map_id] || []);
+        station.push(ctaStop);
+        stations[ctaStop.map_id] = station;
+        return stations;
+    }, {});
+
+    const stationList = Object.keys(stationMap).map((map_id) => {
+        if (stationMap.hasOwnProperty(map_id)) {
+            const location = stationMap[map_id][0].location;
+            const station_name = stationMap[map_id][0].station_name;
+            return {
+                map_id: map_id,
+                location: location,
+                station_name: station_name,
+                stops: stationMap[map_id]
+            }
+        } 
+    });
+    return stationList;
+}
 
 function App() {
     const [stations, setStations] = useState([])
@@ -110,8 +131,8 @@ function App() {
         const response = await fetch(url, {"app_token": "Bekodn643P417LZVWPfAeTldB"});
         if (!response.ok) throw response;
         const json = await response.json();
-        console.log(json);
-        setStations(json);
+        const formattedStations = formatStations(json);
+        setStations(formattedStations);
     }
     useEffect(() => {
         //getTrainTracker(train_url);
