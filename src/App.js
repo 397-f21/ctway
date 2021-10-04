@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {getDistance, convertDistance} from 'geolib';
+import './App.css'
 
 
 require('dotenv').config();
@@ -27,18 +28,18 @@ const Card = ({ station, location }) => {
     const directionsURL = `https://www.google.com/maps/dir/?api=1&origin=${location.latitude}%2C${location.longitude}&destination=${station.location.latitude}%2C${station.location.longitude}&travelmode=walking`
 
     return (
-        <div className="card">
-            <div className="card-body">
-                <div className="card-title">{station.stop_name}</div>
-                <div className="card-text">{roundedDistance} miles</div>
-                <a className="card-text" href={directionsURL}>Directions</a>
+            <div className="card">
+                <div className="card-body">
+                    <div className="card-title">{station.stop_name}</div>
+                    <div className="card-text">{roundedDistance} miles</div>
+                    <a className="card-text" href={directionsURL}>Directions</a>
+                </div>
             </div>
-        </div>
     )
 }
 
 const StationList = ({ stations, location }) => (
-    <div>
+    <div className="card-wrapper">
         { stations.map(station => <Card key={station.stop_id} location={location} station={ station } />) }
     </div>
 )
