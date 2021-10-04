@@ -24,7 +24,7 @@ const Card = ({ station, location }) => {
 
     const distanceToMiles = convertDistance(getDistance(formattedLoc, formattedStationLoc), 'mi');
     const roundedDistance = Math.round(distanceToMiles * 100) / 100;
-    const directionsURL = `https://www.google.com/maps/search/?api=1&query=${station.location.latitude}%2C${station.location.longitude}`
+    const directionsURL = `https://www.google.com/maps/dir/?api=1&origin=${location.latitude}%2C${location.longitude}&destination=${station.location.latitude}%2C${station.location.longitude}&travelmode=walking`
 
     return (
         <div className="card">
