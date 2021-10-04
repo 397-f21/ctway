@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {getDistance} from 'geolib';
+import {getDistance, convertDistance} from 'geolib';
 
 
 require('dotenv').config();
@@ -21,11 +21,15 @@ const Card = ({ station, location }) => {
         latitude: parseFloat(station.location.latitude),
         longitude: parseFloat(station.location.longitude)
     }
+
+    const distanceToMiles = convertDistance(getDistance(formattedLoc, formattedStationLoc), 'mi');
+    const roundedDistance = Math.round(distanceToMiles * 100) / 100;
+
     return (
         <div className="card">
             <div className="card-body">
                 <div className="card-title">{station.stop_name}</div>
-                <div className="card-text">{getDistance(formattedLoc, formattedStationLoc)} meters</div>
+                <div className="card-text">{roundedDistance} miles</div>
             </div>
         </div>
     )
