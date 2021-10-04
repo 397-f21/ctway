@@ -24,12 +24,14 @@ const Card = ({ station, location }) => {
 
     const distanceToMiles = convertDistance(getDistance(formattedLoc, formattedStationLoc), 'mi');
     const roundedDistance = Math.round(distanceToMiles * 100) / 100;
+    const directionsURL = `https://www.google.com/maps/search/?api=1&query=${station.location.latitude}%2C${station.location.longitude}`
 
     return (
         <div className="card">
             <div className="card-body">
                 <div className="card-title">{station.stop_name}</div>
                 <div className="card-text">{roundedDistance} miles</div>
+                <a className="card-text" href={directionsURL}>Directions</a>
             </div>
         </div>
     )
@@ -66,6 +68,7 @@ const sortByDist = (stations, userLoc) => {
 
 const kNearestStations = (stations, userLoc, k) =>
     sortByDist(stations, userLoc).slice(0, k);
+
 
 
 //const train_url = `http://lapi.transitchicago.com/api/1.0/ttfollow.aspx?key=${trainTrackerKey}&runnumber=830&outputType=JSON`;
