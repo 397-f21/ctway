@@ -43,7 +43,7 @@ const Card = ({ station, location }) => {
                     </div>
                 </div>
                 <div className="card-text">{roundedDistance} miles</div>
-                {station.etas ? renderArrivals(station.etas) : null}
+                {renderArrivals(station.etas)}
                 {/* <a className="card-text" href={directionsURL}>Directions</a> */}
             </div>
         </div>
@@ -51,13 +51,12 @@ const Card = ({ station, location }) => {
 }
 
 const renderArrivals = (etas) => {
-    console.log(etas);
     return (
-        etas.length <= 0 ? null :
-            <div>{etas.map((eta) => (
-                <div key={eta.arrT} className="card-text">Arrival Time: {eta.arrT}</div>
+        etas.length > 0 ?
+            <div>{etas.map((eta, index) => (
+                <div key={index} className="card-text">Arrival Time: {eta.arrT}</div>
             ))}
-            </div>
+            </div> : null
     )
 }
 
@@ -70,13 +69,10 @@ const StationList = ({ stations, location }) => (
 // station.location = {latitude: ..., longitude...}
 // userLoc = {latitude: ..., longitude...}
 const sortByDist = (stations, userLoc) => {
-    // console.log(stations)
-    console.log(userLoc);
     const formattedUserLoc = {
         latitude: userLoc.latitude,
         longitude: userLoc.longitude
     }
-    console.log(getDistance(stations[0].location, formattedUserLoc));
     return stations.sort((s1, s2) => {
         const s1LocFormat = {
             latitude: parseFloat(s1.location.latitude),
@@ -90,29 +86,13 @@ const sortByDist = (stations, userLoc) => {
     });
 }
 
-const kNearestStations = (stations, userLoc, k) =>
-    sortByDist(stations, userLoc).slice(0, k);
-
-const updateEtas = (stations) => {
-    console.log(stations);
-    return stations;
-    // return stations.map(async (station) => {
-    //     console.log(station.map_id);
-    //     // const etas = [{arrT: 5}, {arrT: 6}, {arrT: 8}]
-    //     const train_url = `https://cors-anywhere.herokuapp.com/http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${trainTrackerKey}&mapid=${station.map_id}&max=5&outputType=JSON`;
-    //     const etas = await getTrainTracker(train_url);
-    //     station.etas = etas;
-    //     return station;
-    // });
-}
-
 const stops_url = 'https://data.cityofchicago.org/resource/8pix-ypme.json'
 
 const getTrainTracker = async (url) => {
     const response = await fetch(url);
     if (!response.ok) throw response;
     const json = await response.json();
-    console.log(json.ctatt.eta);
+    return json.ctatt.eta;
 }
 
 const formatStations = (ctaData) => {
@@ -131,7 +111,8 @@ const formatStations = (ctaData) => {
                 map_id: map_id,
                 location: location,
                 station_name: station_name,
-                stops: stationMap[map_id]
+                stops: stationMap[map_id],
+                etas: []
             }
         }
     });
@@ -142,15 +123,6 @@ function App() {
     const [stations, setStations] = useState([])
     const [nearStations, setNearStations] = useState([])
     const [userLoc, setUserLoc] = useState();
-
-    // const getLocation = async () => {
-    //     const pos = await new Promise((resolve, reject) => {
-    //         navigator.geolocation.getCurrentPosition(resolve, reject);
-    //     });
-    //     // console.log(pos.coords);
-    //     // setUserLoc(pos.coords);
-    //     return pos.coords;
-    // }
 
     const getLocation = async () => {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -165,24 +137,27 @@ function App() {
         const formattedStations = formatStations(json);
         setStations(formattedStations);
     }
-    // const updateNearStations = async (stations, k) => {
-    //     console.log(userLoc);
-    //     const kNearest = kNearestStations(stations, userLoc, k);
-    //     // const kNearestEta = await updateEtas(kNearest);
-    //     setNearStations(kNearest);
-    // }
+
+    const updateNearStations = async (stations, k) => {
+        const kNearest = kNearestStations(stations, userLoc, k);
+        updateEtas(kNearest);
+    }
+
+    const kNearestStations = (stations, userLoc, k) =>
+        sortByDist(stations, userLoc).slice(0, k);
+
+    const updateEtas = async (stations) => {
+        for (let i = 0; i < stations.length; i++) {
+            const train_url = `https://cors-anywhere.herokuapp.com/http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${trainTrackerKey}&mapid=${stations[i].map_id}&max=3&outputType=JSON`;
+            const response = await fetch(train_url);
+            if (!response.ok) throw response;
+            const json = await response.json();
+            stations[i].etas = json.ctatt.eta;
+        }
+        setNearStations(stations);
+    }
+
     useEffect(() => {
-        // const gatherData = async () => {
-        //     const location = await getLocation();
-        //     // const getTrainStopsPromise = getTrainStops(stops_url);
-        //     // await getTrainStopsPromise;
-        //     console.log(location);
-        //     setUserLoc(location);
-        //     console.log(userLoc);
-        //     console.log('done');
-        //     updateNearStations(stations, 1);
-        // }
-        // gatherData();
         getLocation();
         getTrainStops(stops_url);
     }, [])
@@ -190,14 +165,13 @@ function App() {
     if (stations.length === 0) return <h1>Awaiting stations...</h1>;
     if (!userLoc) return <h1>Awaiting user location...</h1>;
 
-    // useEffect(() => {
-    //     setNearStations(kNearestStations(stations, userLoc, 1));
-    // })
-
     return (
         <div className="app-wrapper">
             <Header />
-            <StationList location={userLoc} stations={kNearestStations(stations, userLoc, 3)} />
+            <button onClick={() => updateNearStations(stations, 3)}>
+                Find Stations!
+            </button>
+            <StationList location={userLoc} stations={nearStations} />
         </div>
     );
 }
