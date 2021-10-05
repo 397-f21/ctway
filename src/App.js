@@ -88,13 +88,6 @@ const sortByDist = (stations, userLoc) => {
 
 const stops_url = 'https://data.cityofchicago.org/resource/8pix-ypme.json'
 
-const getTrainTracker = async (url) => {
-    const response = await fetch(url);
-    if (!response.ok) throw response;
-    const json = await response.json();
-    return json.ctatt.eta;
-}
-
 const formatStations = (ctaData) => {
     const stationMap = ctaData.reduce((stations, ctaStop) => {
         const station = (stations[ctaStop.map_id] || []);
@@ -104,16 +97,14 @@ const formatStations = (ctaData) => {
     }, {});
 
     const stationList = Object.keys(stationMap).map((map_id) => {
-        if (stationMap.hasOwnProperty(map_id)) {
-            const location = stationMap[map_id][0].location;
-            const station_name = stationMap[map_id][0].station_name;
-            return {
-                map_id: map_id,
-                location: location,
-                station_name: station_name,
-                stops: stationMap[map_id],
-                etas: []
-            }
+        const location = stationMap[map_id][0].location;
+        const station_name = stationMap[map_id][0].station_name;
+        return {
+            map_id: map_id,
+            location: location,
+            station_name: station_name,
+            stops: stationMap[map_id],
+            etas: []
         }
     });
     return stationList;
