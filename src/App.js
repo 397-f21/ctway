@@ -7,10 +7,10 @@ require('dotenv').config();
 
 // PUT TRAIN_TRACKER_KEY HERE
 const trainTrackerKey = "344088052b6d4c6a91bccd12775f34b3";
-const Header = () => {
+const Header = ({text}) => {
     return (
         <div className="header-wrapper">
-            <h1>Nearest Stations</h1>
+            <h1>{text}</h1>
         </div>
     )
 }
@@ -114,6 +114,7 @@ function App() {
     const [stations, setStations] = useState([])
     const [nearStations, setNearStations] = useState([])
     const [userLoc, setUserLoc] = useState();
+    const [buttonCLicked, setButtonClicked] = useState(false);
 
     const getLocation = async () => {
         navigator.geolocation.getCurrentPosition(function (position) {
@@ -153,15 +154,36 @@ function App() {
         getTrainStops(stops_url);
     }, [])
 
-    if (stations.length === 0) return <h1>Awaiting stations...</h1>;
-    if (!userLoc) return <h1>Awaiting user location...</h1>;
+    if (stations.length === 0 || !userLoc){
+        return (
+            <div className="loading">
+                <h1>Loading...</h1>
+            </div>
+        )
+    };
+    // if (!userLoc) return <h1>Awaiting user location...</h1>;
 
+    if (buttonCLicked === false){
+        return(
+            <div className="app-wrapper">
+                <Header text={"Find Nearby Stations"}/>
+                <div className = "button-wrapper">
+                    <div className="button-style" onClick={() => {
+                        updateNearStations(stations, 3);
+                        setButtonClicked(true);
+                    }}>
+                        <svg width="63" height="79" viewBox="0 0 63 79" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M31.25 0L0 76.2083L2.95833 79.1667L31.25 66.6667L59.5417 79.1667L62.5 76.2083L31.25 0Z" fill="white"/>
+                        </svg>
+                        <h1>Current Location</h1>
+                    </div>
+                </div>
+            </div>
+        )
+    }
     return (
         <div className="app-wrapper">
-            <Header />
-            <button onClick={() => updateNearStations(stations, 3)}>
-                Find Stations!
-            </button>
+            <Header text={"Nearest Stations"}/>
             <StationList location={userLoc} stations={nearStations} />
         </div>
     );
