@@ -4,7 +4,8 @@ import './App.css'
 
 
 require('dotenv').config();
-
+var date = new Date();
+var timestamp = date.getTime();
 // PUT TRAIN_TRACKER_KEY HERE
 const trainTrackerKey = "344088052b6d4c6a91bccd12775f34b3";
 const Header = ({text}) => {
@@ -43,6 +44,7 @@ const Card = ({ station, location }) => {
                     </div>
                 </div>
                 <div className="card-text">{roundedDistance} miles</div>
+                
                 {renderArrivals(station.etas)}
                 {/* <a className="card-text" href={directionsURL}>Directions</a> */}
             </div>
@@ -54,7 +56,9 @@ const renderArrivals = (etas) => {
     return (
         etas.length > 0 ?
             <div>{etas.map((eta, index) => (
-                <div key={index} className="card-text">Arrival Time: {eta.arrT}</div>
+
+                <div key={index} className="card-text">Arrival Time: {disPlayMin((Date.parse(eta.arrT) - timestamp))}</div>
+
             ))}
             </div> : null
     )
@@ -109,6 +113,28 @@ const formatStations = (ctaData) => {
     });
     return stationList;
 }
+
+
+function disPlayMin(timeStamp){
+
+    var minTimeStamp = Math.floor((timeStamp)/60000);
+
+    if (minTimeStamp < 0){
+        return "Just Arrived";
+    }
+    else if(minTimeStamp <= 1){
+        return "Arriving Now";
+    }
+    else{
+        return minTimeStamp + " mins";
+    }
+}
+
+function toTimestamp(strDate){
+    var datum = Date.parse(strDate);
+    return datum/1000;
+ }
+ alert(toTimestamp('02/13/2009 23:31:30'));
 
 function App() {
     const [stations, setStations] = useState([])
