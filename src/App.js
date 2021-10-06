@@ -134,7 +134,7 @@ function toTimestamp(strDate){
     var datum = Date.parse(strDate);
     return datum/1000;
  }
- alert(toTimestamp('02/13/2009 23:31:30'));
+//  alert(toTimestamp('02/13/2009 23:31:30'));
 
 function App() {
     const [stations, setStations] = useState([])
