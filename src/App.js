@@ -7,7 +7,7 @@ import ReactModal from 'react-modal';
 require('dotenv').config();
 var date = new Date();
 var timestamp = date.getTime();
-const numStations = 10
+const numStations = 3
 // PUT TRAIN_TRACKER_KEY HERE
 const trainTrackerKey = "344088052b6d4c6a91bccd12775f34b3";
 const Header = ({ text }) => {
