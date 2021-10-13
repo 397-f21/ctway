@@ -201,8 +201,18 @@ function App() {
         setStations(formattedStations);
     }
 
-    const updateNearStations = async (stations, k, allowedLines) => {
-        const kNearest = kNearestStations(stations, userLoc, k);
+    const updateNearStations = async (stations, k, ) => {
+        const filtered_stations = stations.filter((station) => {
+            for (const stop of station.stops) {
+                for (const line of ['brn']) {
+                    if (stop[line] === true) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        })
+        const kNearest = kNearestStations(filtered_stations, userLoc, k);
         updateEtas(kNearest);
     }
 
@@ -240,7 +250,7 @@ function App() {
                 <Header text={"Find Nearby Stations"}/>
                 <div className = "button-wrapper">
                     <div className="button-style" onClick={() => {
-                        updateNearStations(stations, 3);
+                        updateNearStations(stations, 1);
                         setbuttonClicked(true);
                     }}>
                         <svg width="63" height="79" viewBox="0 0 63 79" fill="none" xmlns="http://www.w3.org/2000/svg">
