@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getDistance, convertDistance } from 'geolib';
 import './App.css'
+import ReactModal from 'react-modal';
 
 
 require('dotenv').config();
@@ -123,30 +124,26 @@ const formatStations = (ctaData) => {
     return stationList;
 }
 
-const FilterButton = () => (
-    <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filter">Filter</button>
-)
+// const FilterCard = () => (
+//     <div className="modal fade" id="filter" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+//         <div className="modal-dialog">
+//             <div className="modal-content">
+//             <div className="modal-header">
+//                 <h5 className="modal-title" id="exampleModalLabel">Modal title</h5>
+//                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+//             </div>
+//             <div className="modal-body">
+//                 ...
+//             </div>
+//             <div className="modal-footer">
+//                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+//                 <button type="button" className="btn btn-primary">Save changes</button>
+//             </div>
+//             </div>
+//         </div>
+//     </div>
 
-const FilterCard = () => (
-    <div className="modal fade" id="filter" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div className="modal-dialog">
-            <div className="modal-content">
-            <div className="modal-header">
-                <h5 className="modal-title" id="exampleModalLabel">Modal title</h5>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-                ...
-            </div>
-            <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" className="btn btn-primary">Save changes</button>
-            </div>
-            </div>
-        </div>
-    </div>
-
-)
+// )
 
 function disPlayMin(timeStamp){
 
@@ -173,12 +170,27 @@ function App() {
     const [stations, setStations] = useState([])
     const [nearStations, setNearStations] = useState([])
     const [userLoc, setUserLoc] = useState();
-    const [buttonCLicked, setButtonClicked] = useState(false);
+    const [buttonClicked, setbuttonClicked] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+
+    ReactModal.setAppElement('#root');
 
     const getLocation = async () => {
         navigator.geolocation.getCurrentPosition(function (position) {
             setUserLoc(position.coords);
         });
+    }
+
+    const FilterButton = () => (
+        <button className="btn btn-primary" onClick={openModal}>Filter</button>
+    )
+
+    const openModal = () => {
+        setModalVisible(true);
+    }
+
+    const closeModal = () => {
+        setModalVisible(false);
     }
 
     const getTrainStops = async (url) => {
@@ -189,7 +201,7 @@ function App() {
         setStations(formattedStations);
     }
 
-    const updateNearStations = async (stations, k) => {
+    const updateNearStations = async (stations, k, allowedLines) => {
         const kNearest = kNearestStations(stations, userLoc, k);
         updateEtas(kNearest);
     }
@@ -222,14 +234,14 @@ function App() {
     };
     // if (!userLoc) return <h1>Awaiting user location...</h1>;
 
-    if (buttonCLicked === false){
+    if (buttonClicked === false){
         return(
             <div className="app-wrapper">
                 <Header text={"Find Nearby Stations"}/>
                 <div className = "button-wrapper">
                     <div className="button-style" onClick={() => {
                         updateNearStations(stations, 3);
-                        setButtonClicked(true);
+                        setbuttonClicked(true);
                     }}>
                         <svg width="63" height="79" viewBox="0 0 63 79" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M31.25 0L0 76.2083L2.95833 79.1667L31.25 66.6667L59.5417 79.1667L62.5 76.2083L31.25 0Z" fill="white"/>
@@ -245,7 +257,11 @@ function App() {
             <Header text={"Nearest Stations"}/>
             <FilterButton />
             <StationList location={userLoc} stations={nearStations} />
-            <FilterCard />
+            {/* <FilterCard /> */}
+            <ReactModal isOpen={modalVisible} onRequestClose={closeModal}>
+                <p>modal here</p>
+
+            </ReactModal>
         </div>
     );
 }
