@@ -34,16 +34,18 @@ const Card = ({ station, location }) => {
         <div className="card" id="card-bootstrap-override" onClick={() => { window.open(directionsURL) }}>
             <div className="card-body">
                 <div className="card-title">
-                    <div className="icon-style">
-                        <svg width="25" height="29" viewBox="0 0 25 29" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12.5 0.916672C6.66668 0.916672 0.833344 1.64584 0.833344 6.75001V20.6042C0.833344 23.4188 3.12293 25.7083 5.93751 25.7083L3.75001 27.8958V28.625H7.00209L9.91876 25.7083H15.4167L18.3333 28.625H21.25V27.8958L19.0625 25.7083C21.8771 25.7083 24.1667 23.4188 24.1667 20.6042V6.75001C24.1667 1.64584 18.9458 0.916672 12.5 0.916672ZM5.93751 22.7917C4.72709 22.7917 3.75001 21.8146 3.75001 20.6042C3.75001 19.3938 4.72709 18.4167 5.93751 18.4167C7.14793 18.4167 8.12501 19.3938 8.12501 20.6042C8.12501 21.8146 7.14793 22.7917 5.93751 22.7917ZM11.0417 12.5833H3.75001V6.75001H11.0417V12.5833ZM13.9583 12.5833V6.75001H21.25V12.5833H13.9583ZM19.0625 22.7917C17.8521 22.7917 16.875 21.8146 16.875 20.6042C16.875 19.3938 17.8521 18.4167 19.0625 18.4167C20.2729 18.4167 21.25 19.3938 21.25 20.6042C21.25 21.8146 20.2729 22.7917 19.0625 22.7917Z" fill="#542E91" />
-                        </svg>
-                    </div>
                     <div>
-                        <h1>{station.station_name}</h1>
+                        <div className="icon-style">
+                            <svg width="25" height="29" viewBox="0 0 25 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12.5 0.916672C6.66668 0.916672 0.833344 1.64584 0.833344 6.75001V20.6042C0.833344 23.4188 3.12293 25.7083 5.93751 25.7083L3.75001 27.8958V28.625H7.00209L9.91876 25.7083H15.4167L18.3333 28.625H21.25V27.8958L19.0625 25.7083C21.8771 25.7083 24.1667 23.4188 24.1667 20.6042V6.75001C24.1667 1.64584 18.9458 0.916672 12.5 0.916672ZM5.93751 22.7917C4.72709 22.7917 3.75001 21.8146 3.75001 20.6042C3.75001 19.3938 4.72709 18.4167 5.93751 18.4167C7.14793 18.4167 8.12501 19.3938 8.12501 20.6042C8.12501 21.8146 7.14793 22.7917 5.93751 22.7917ZM11.0417 12.5833H3.75001V6.75001H11.0417V12.5833ZM13.9583 12.5833V6.75001H21.25V12.5833H13.9583ZM19.0625 22.7917C17.8521 22.7917 16.875 21.8146 16.875 20.6042C16.875 19.3938 17.8521 18.4167 19.0625 18.4167C20.2729 18.4167 21.25 19.3938 21.25 20.6042C21.25 21.8146 20.2729 22.7917 19.0625 22.7917Z" fill="#542E91" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1>{station.station_name}</h1>
+                        </div>
                     </div>
+                    <div className="card-text">{roundedDistance} miles</div>
                 </div>
-                <div className="card-text">{roundedDistance} miles</div>
                 
                 {renderArrivals(station.etas)}
                 {/* <a className="card-text" href={directionsURL}>Directions</a> */}
@@ -52,12 +54,19 @@ const Card = ({ station, location }) => {
     )
 }
 
+const Colors = {
+    'P' : 'Purple'
+}
+
 const renderArrivals = (etas) => {
+    console.log(etas)
     return (
         etas.length > 0 ?
-            <div>{etas.map((eta, index) => (
-
-                <div key={index} className="card-text">Arrival Time: {disPlayMin((Date.parse(eta.arrT) - timestamp))}</div>
+            <div className="content">{etas.map((eta, index) => (
+                <div key={index} className="specific-line">
+                    <div>{eta.destNm}</div>
+                    <div>{disPlayMin((Date.parse(eta.arrT) - timestamp))}</div>
+                </div>
 
             ))}
             </div> : null
