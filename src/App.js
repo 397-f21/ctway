@@ -124,6 +124,19 @@ const formatStations = (ctaData) => {
     return stationList;
 }
 
+const FilterCard = () => (
+    <div>
+        <button onClick = "">Red</button>
+        <button>Orange</button>
+        <button>Yellow</button>
+        <button>Green</button>
+        <button>Blue</button>
+        <button>Purple</button>
+        <button>Pink</button>
+        <button>Brown</button>
+    </div>
+)
+
 // const FilterCard = () => (
 //     <div className="modal fade" id="filter" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 //         <div className="modal-dialog">
@@ -172,6 +185,7 @@ function App() {
     const [userLoc, setUserLoc] = useState();
     const [buttonClicked, setbuttonClicked] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [selectedLines, setSelectedLines] = useState([]);
 
     ReactModal.setAppElement('#root');
 
@@ -201,17 +215,20 @@ function App() {
         setStations(formattedStations);
     }
 
-    const updateNearStations = async (stations, k, ) => {
-        const filtered_stations = stations.filter((station) => {
+    const updateNearStations = async (stations, lines, k) => {
+
+        
+
+        const filtered_stations = lines.length ? stations.filter((station) => {
             for (const stop of station.stops) {
-                for (const line of ['brn']) {
+                for (const line of lines) {
                     if (stop[line] === true) {
                         return true;
                     }
                 }
             }
             return false;
-        })
+        }) : stations;
         const kNearest = kNearestStations(filtered_stations, userLoc, k);
         updateEtas(kNearest);
     }
