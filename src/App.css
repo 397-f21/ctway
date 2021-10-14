@@ -20,6 +20,12 @@
     font-size: 15px;
 }
 
+.card-body{
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+}
+
 .card-wrapper{
     display: flex;
     flex-direction: column;
@@ -29,9 +35,17 @@
     overflow-y: scroll;
 }
 
+.filter-card-list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    overflow-y: scroll;
+}
+
 .card-title{
     display: flex;
-    height: 30%;
+    height: 15%;
     color: #5E5E5E;
 }
 
@@ -101,4 +115,17 @@
 .loading h1{
     font-family: "Poppins";
     color: #5688DA;
+}
+
+.content{
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+}
+
+.specific-line{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-grow: 1;
 }
