@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { getDistance, convertDistance } from 'geolib';
 import './App.css'
 import ReactModal from 'react-modal';
-
+import MockConstants from './Mock.js'
 
 require('dotenv').config();
 var date = new Date();
-var timestamp = date.getTime();
+var timestamp = MockConstants.mockDataOverride ? MockConstants.mockTime : date.getTime();
 const numStations = 3
 // PUT TRAIN_TRACKER_KEY HERE
 const trainTrackerKey = "344088052b6d4c6a91bccd12775f34b3";
@@ -48,30 +48,30 @@ const Card = ({ station, location, line }) => {
                     </div>
                     <div className="card-text">{roundedDistance} miles</div>
                 </div>
-                {renderArrivals(station.etas[line])}
+                {renderArrivals(station.etas[line], roundedDistance)}
             </div>
         </div>
     )
 }
 
 const Colors = {
-    'red': {color: 'red', hex: '#D33D3D'},
-    'org': {color: 'orange', hex: '#EF4925'},
-    'y': {color: 'yellow', hex: '#F5E50B'},
-    'g': {color: 'green', hex: '#109D49'},
-    'blue': {color: 'blue', hex: '#17A0DB'},
-    'brn': {color: 'brown', hex: '#62361C'},
-    'p': {color: 'purple', hex: '#542E91'},
-    'pink': {color: 'pink', hex: '#E37FA7'},
+    'red': { color: 'red', hex: '#D33D3D' },
+    'org': { color: 'orange', hex: '#EF4925' },
+    'y': { color: 'yellow', hex: '#F5E50B' },
+    'g': { color: 'green', hex: '#109D49' },
+    'blue': { color: 'blue', hex: '#17A0DB' },
+    'brn': { color: 'brown', hex: '#62361C' },
+    'p': { color: 'purple', hex: '#542E91' },
+    'pink': { color: 'pink', hex: '#E37FA7' },
 }
 
-const renderArrivals = (etas) => {
+const renderArrivals = (etas, distance) => {
     return (
         etas !== undefined && etas.length > 0 ?
             <div className="content">{etas.map((eta, index) => (
                 <div key={index} className="specific-line">
                     <div>{eta.destNm}</div>
-                    <div>{disPlayMin((Date.parse(eta.arrT) - timestamp))}</div>
+                    <div>{disPlayMin((Date.parse(eta.arrT) - timestamp), distance)}</div>
                 </div>
 
             ))}
@@ -180,10 +180,14 @@ const FilterCard = ({ line, selectedLines, setSelectedLines }) => {
     );
 };
 
-function disPlayMin(timeStamp) {
+function disPlayMin(timeStamp, distance) {
+
+    if (MockConstants.mockDataOverride && MockConstants.mockTrainTimeUsingDist) {
+        timeStamp += Math.min(40 * 60000 * distance, 15 * 60000);
+    }
 
     var minTimeStamp = Math.floor((timeStamp) / 60000);
-
+    
     if (minTimeStamp < 0) {
         return "Just Arrived";
     }
@@ -212,9 +216,14 @@ function App() {
     ReactModal.setAppElement('#root');
 
     const getLocation = async () => {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            setUserLoc(position.coords);
-        });
+        if (MockConstants.mockDataOverride) {
+            setUserLoc(MockConstants.mockUserLoc);
+        }
+        else {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                setUserLoc(position.coords);
+            });
+        }
     }
 
     const FilterButton = () => (
@@ -268,14 +277,20 @@ function App() {
         for (let i = 0; i < stations.length; i++) {
             for (const line of allowedLines) {
                 if (stationHasLine(stations[i], line)) {
-                    const train_url = `https://cors-anywhere.herokuapp.com/http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${trainTrackerKey}&mapid=${stations[i].map_id}&rt=${line}&max=3&outputType=JSON`;
-                    const response = await fetch(train_url);
-                    if (!response.ok) throw response;
-                    const json = await response.json();
-                    stations[i].etas[line] = json.ctatt.eta;
+                    if (MockConstants.mockDataOverride) {
+                        stations[i].etas[line] = MockConstants.mockTrains[line];
+                    }
+                    else {
+                        const train_url = `https://cors-anywhere.herokuapp.com/http://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=${trainTrackerKey}&mapid=${stations[i].map_id}&rt=${line}&max=3&outputType=JSON`;
+                        const response = await fetch(train_url);
+                        if (!response.ok) throw response;
+                        const json = await response.json();
+                        console.log(json.ctatt.eta);
+                        stations[i].etas[line] = json.ctatt.eta;
+                    }
                 }
             }
-            
+
         }
         setNearStations(stations);
     }
@@ -316,7 +331,7 @@ function App() {
         <div className="app-wrapper">
             <Header text={"Nearest Stations"} />
             <FilterButton />
-            <StationList location={userLoc} stations={nearStations} lines={selectedLines}/>
+            <StationList location={userLoc} stations={nearStations} lines={selectedLines} />
             <ReactModal isOpen={modalVisible} onRequestClose={closeModal}>
                 <div className="modal-text">Filter by Line</div>
                 <FilterCards selectedLines={selectedLines} setSelectedLines={setSelectedLines} />
