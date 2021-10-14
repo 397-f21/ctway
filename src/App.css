@@ -35,6 +35,14 @@
     overflow-y: scroll;
 }
 
+.filter-card-list{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    overflow-y: scroll;
+}
+
 .card-title{
     display: flex;
     height: 15%;
