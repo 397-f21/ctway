@@ -70,7 +70,7 @@ const renderArrivals = (etas, distance) => {
         etas !== undefined && etas.length > 0 ?
             <div className="content">{etas.map((eta, index) => (
                 <div key={index} className="specific-line">
-                    <div>{eta.destNm}</div>
+                    <div>{eta.destNm}-bound</div>
                     <div>{disPlayMin((Date.parse(eta.arrT) - timestamp), distance)}</div>
                 </div>
 
