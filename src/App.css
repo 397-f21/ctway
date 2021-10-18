@@ -16,8 +16,33 @@
     font-family: 'Poppins', sans-serif;
     color: #5688DA;
 }
+
+.header-wrapper-main{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 10%;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    color: #5688DA;
+}
+
+.header-wrapper-main h1{
+    font-size: 25px;
+}
+
+.filterButtonWrapper{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+.filterButtonWrapper:hover{
+    cursor:pointer
+}
+
 .header-wrapper h1{
-    font-size: 15px;
+    font-size: 35px;
 }
 
 .card-body{
@@ -121,6 +146,7 @@
     display: flex;
     flex-grow: 1;
     flex-direction: column;
+    margin-top: 30px;
 }
 
 .specific-line{

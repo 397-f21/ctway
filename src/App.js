@@ -226,12 +226,25 @@ function App() {
         }
     }
 
-    const FilterButton = () => (
-        <button className="btn btn-primary" onClick={openModal}>Filter</button>
-    )
+    // const FilterButton = () => (
+    //     <button className="btn btn-primary" onClick={openModal}>Filter</button>
+    // )
 
     const openModal = () => {
         setModalVisible(true);
+    }
+
+    const HeaderMain = ({ text }) => {
+        return (
+            <div className="header-wrapper-main">
+                <h1>{text}</h1>
+                <div className="filterButtonWrapper" onClick={openModal}>
+                    <svg width="27" height="19" viewBox="0 0 27 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.5833 18.25H16.4167V15.3333H10.5833V18.25ZM0.375 0.75V3.66667H26.625V0.75H0.375ZM4.75 10.9583H22.25V8.04167H4.75V10.9583Z" fill="#5688DA"/>
+                    </svg>  
+                </div>
+            </div>
+        )
     }
 
     const closeModal = () => {
@@ -313,7 +326,7 @@ function App() {
     if (buttonClicked === false) {
         return (
             <div className="app-wrapper">
-                <Header text={"Find Nearby Stations"} />
+                <Header text={"CTWay"} />
                 <div className="button-wrapper">
                     <div className="button-style" onClick={() => {
                         updateNearStations(stations, selectedLines, numStations);
@@ -322,7 +335,7 @@ function App() {
                         <svg width="63" height="79" viewBox="0 0 63 79" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M31.25 0L0 76.2083L2.95833 79.1667L31.25 66.6667L59.5417 79.1667L62.5 76.2083L31.25 0Z" fill="white" />
                         </svg>
-                        <h1>Current Location</h1>
+                        <h1>Find Nearby Stations</h1>
                     </div>
                 </div>
             </div>
@@ -330,8 +343,8 @@ function App() {
     }
     return (
         <div className="app-wrapper">
-            <Header text={"Nearest Stations"} />
-            <FilterButton />
+            <HeaderMain text={"Nearest Stations"} />
+            {/* <FilterButton /> */}
             <StationList location={userLoc} stations={nearStations} lines={selectedLines} />
             <ReactModal isOpen={modalVisible} onRequestClose={closeModal}>
                 <div className="modal-text">Filter by Line</div>
