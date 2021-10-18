@@ -1,5 +1,5 @@
 const MockConstants = {
-    mockDataOverride: true,
+    mockDataOverride: false,
     mockUserLoc: {
         latitude: 41.8827,
         longitude: -87.6233
