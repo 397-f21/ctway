@@ -281,7 +281,7 @@ function App() {
                         stations[i].etas[line] = MockConstants.mockTrains[line];
                     }
                     else {
-                        const train_url = `http://localhost:5000?key=${trainTrackerKey}&mapid=${stations[i].map_id}&rt=${line}&max=3&outputType=JSON`;
+                        const train_url = `https://us-central1-ctway-api.cloudfunctions.net/app?key=${trainTrackerKey}&mapid=${stations[i].map_id}&rt=${line}&max=3&outputType=JSON`;
                         const response = await fetch(train_url);
                         // console.log(await response.json());
                         if (!response.ok) throw response;
