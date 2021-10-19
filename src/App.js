@@ -3,6 +3,9 @@ import { getDistance, convertDistance } from 'geolib';
 import './App.css'
 import ReactModal from 'react-modal';
 import MockConstants from './Mock.js'
+import ReactNotification from 'react-notifications-component'
+import 'react-notifications-component/dist/theme.css'
+import { store } from 'react-notifications-component';
 
 require('dotenv').config();
 var date = new Date();
@@ -15,8 +18,12 @@ const Header = ({ text }) => {
         <div className="header-wrapper">
             <h1>{text}</h1>
         </div>
+        
     )
 }
+
+
+var renderTime = 0
 
 const Card = ({ station, location, line }) => {
     const formattedLoc = {
@@ -179,7 +186,6 @@ const FilterCard = ({ line, selectedLines, setSelectedLines }) => {
         </div>
     );
 };
-
 function disPlayMin(timeStamp, distance) {
 
     if (MockConstants.mockDataOverride && MockConstants.mockTrainTimeUsingDist) {
@@ -307,7 +313,24 @@ function App() {
 
         }
         setNearStations(stations);
+        if (renderTime == 0){
+            store.addNotification({
+                message: "Use filter to select lines",
+                type: "success",
+                insert: "top",
+                container: "top-right",
+                animationIn: ["animate__animated", "animate__fadeIn"],
+                animationOut: ["animate__animated", "animate__fadeOut"],
+                dismiss: {
+                duration: 2500,
+                onScreen: true
+                }
+            });
+        }
+        renderTime = renderTime + 1
     }
+
+
 
     useEffect(() => {
         getLocation();
@@ -322,6 +345,7 @@ function App() {
         )
     };
     // if (!userLoc) return <h1>Awaiting user location...</h1>;
+    
 
     if (buttonClicked === false) {
         return (
@@ -344,7 +368,8 @@ function App() {
     return (
         <div className="app-wrapper">
             <HeaderMain text={"Nearest Stations"} />
-            {/* <FilterButton /> */}
+            {/* <FilterButton /> */} 
+            <ReactNotification/>     
             <StationList location={userLoc} stations={nearStations} lines={selectedLines} />
             <ReactModal isOpen={modalVisible} onRequestClose={closeModal}>
                 <div className="modal-text">Filter by Line</div>
